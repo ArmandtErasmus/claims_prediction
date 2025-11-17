@@ -17,10 +17,12 @@ def load_data():
 
 def data_visualisation(data, map):
 
-    col1, col2 = st.columns(2)
-
     # MiWay colour :)
     base_color = "#df004c"
+
+    st.markdown("<h2 style='color: #df004c;'>Data Visualisation</h2>", unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
 
     df = data.copy()
     gdf = map
@@ -94,7 +96,7 @@ def data_visualisation(data, map):
     sns.set_style("whitegrid")
 
     with col2:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(7, 7))
         sns.barplot(x=claims_by_gender.index, y=claims_by_gender.values, color=base_color, ax=ax)
         ax.set_title(
             "Number of Claims by Gender", 
@@ -114,7 +116,8 @@ def data_visualisation(data, map):
         plt.yticks(color="#e23e75", fontsize=10)
         st.pyplot(fig)
 
-        fig, ax = plt.subplots()
+    with col3:
+        fig, ax = plt.subplots(figsize=(7, 7))
         sns.barplot(x=claims_by_car_colour.index, y=claims_by_car_colour.values, color=base_color, ax=ax)
         ax.set_title(
             "Number of Claims by Car Colour",
