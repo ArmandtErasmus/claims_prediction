@@ -20,7 +20,7 @@ def load_data():
 
 def data_visualisation(data, map):
 
-    # MiWay colour :) and some page customisations
+    #  colour :) and some page customisations
     base_color = "#df004c"
     st.markdown("<h2 style='color: #df004c;'>Data Visualisation and Analysis</h2>", unsafe_allow_html=True)
 
@@ -66,7 +66,6 @@ def data_visualisation(data, map):
     cmap = mcolors.LinearSegmentedColormap.from_list("custom_blues", ["#ff7ea9", base_color])
     sns.set_style("whitegrid")
 
-    # --- Plot + description pairs ---
     plot_info = [
         {
             "title": "Number of Claims by Province",
@@ -163,12 +162,10 @@ def model_evaluation(data):
         st.warning("Please select at least one feature to train the model.")
         return
 
-    # --- ENCODING ---
     ohe_columns = ["province", "carcolour"]
     df_encoded = pd.get_dummies(df, columns=ohe_columns, drop_first=True)
     df_encoded = df_encoded.astype({col: int for col in df_encoded.select_dtypes('bool').columns})
 
-    # Build model feature list
     model_features = []
     for feat in selected_features:
         if feat in ohe_columns:
@@ -179,25 +176,16 @@ def model_evaluation(data):
     st.write("### Model Features Used")
     st.code(", ".join(model_features))
 
-    # ----------------------------
-    # Prepare matrices
-    # ----------------------------
     y = df_encoded["claims"]
     X = df_encoded[model_features]
     X = sm.add_constant(X)
 
-    # Offset (log exposure)
     offset = np.log(df_encoded["exp_years"])
 
-    # Inflation predictors (same as X)
     X_infl = sm.add_constant(X)
 
-    # Two side-by-side columns
     col_zip, col_poi = st.columns(2)
 
-    # ===========================================
-    #        COLUMN 1 — ZERO INFLATED POISSON
-    # ===========================================
     with col_zip:
         st.subheader("Zero-Inflated Poisson (ZIP)")
 
@@ -211,13 +199,11 @@ def model_evaluation(data):
 
             st.success("ZIP model trained successfully!")
 
-            # --- Clean ZIP metrics ---
             st.write("### ZIP Metrics")
             st.write(f"**AIC:** {zip_model.aic:.3f}")
             st.write(f"**BIC:** {zip_model.bic:.3f}")
             st.write(f"**Log-Likelihood:** {zip_model.llf:.3f}")
 
-            # Pseudo R²
             null_model_llf = ZeroInflatedPoisson(
                 endog=y,
                 exog=np.ones((len(y), 1)),
@@ -227,10 +213,8 @@ def model_evaluation(data):
             pseudo_r2 = 1 - zip_model.llf / null_model_llf
             st.write(f"**Pseudo R²:** {pseudo_r2:.3f}")
 
-            # Preds
             df_encoded["pred_zip"] = zip_model.predict(X, exog_infl=X_infl)
 
-            # Coefficient table (NO NaN std errors shown)
             st.write("### ZIP Coefficients (no SE reported)")
             zip_params = pd.DataFrame({
                 "coef": zip_model.params,
@@ -240,10 +224,6 @@ def model_evaluation(data):
         except Exception as e:
             st.error(f"ZIP failed: {e}")
 
-
-    # ===========================================
-    #          COLUMN 2 — STANDARD POISSON GLM
-    # ===========================================
     with col_poi:
         st.subheader("Standard Poisson GLM")
 
@@ -259,7 +239,6 @@ def model_evaluation(data):
 
             st.success("Poisson model trained successfully!")
 
-            # Clean summary
             st.write("### Poisson Summary")
             st.markdown(glm_model.summary().as_html(), unsafe_allow_html=True)
 
@@ -268,14 +247,9 @@ def model_evaluation(data):
         except Exception as e:
             st.error(f"Poisson failed: {e}")
 
-
-    # ===========================================
-    #     SHARED LIFT CHART — ZIP vs POISSON
-    # ===========================================
     st.subheader("Lift Chart (Model Comparison)")
 
     try:
-        # Use ZIP predictions for deciles (more accurate)
         df_encoded["decile"] = pd.qcut(df_encoded["pred_zip"], 10, labels=False) + 1
 
         lift = df_encoded.groupby("decile").agg(
