@@ -11,6 +11,7 @@ import geopandas as gp
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from statsmodels.discrete.count_model import ZeroInflatedPoisson, ZeroInflatedNegativeBinomialP
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 def load_data():
 
@@ -40,6 +41,9 @@ def data_visualisation(data, map):
     # Aggregate by car colour
     claims_by_car_colour = df.groupby("carcolour")["total_claims"].sum()
 
+    # get claims counts data :)
+    counts = df['claims'].value_counts().sort_index()
+    zoom_counts = counts[counts.index.isin([3,4])]
     # Province mapping
     province_map = {
         "MP":  "Mpumalanga",
@@ -106,7 +110,26 @@ def data_visualisation(data, map):
             "description": "It is clear that white cars have the most claims, followed by red cars, and then black cars, "
                         "with yellow cars having the least. This does not necessarily imply higher risk for white cars; "
                         "it is because white cars are more common."
+        },
+        {
+            "title": "Distribution of the Number of Claims",
+            "plot_func": lambda ax: (
+                
+                sns.barplot(x=counts.index, y=counts.values, color=base_color, ax=ax),
+                
+                (lambda axins: (
+                    axins.bar(counts[counts.index.isin([3,4])].index,
+                            counts[counts.index.isin([3,4])].values,
+                            color=base_color),
+                    axins.set_title("Zoom: 3-4 claims", fontsize=8),
+                    axins.set_xticks([3, 4]),  
+                    axins.set_xticklabels([3, 4]), 
+                    axins.set_ylim(0, counts[counts.index.isin([3,4])].max()*1.2)
+                ))(inset_axes(ax, width="40%", height="40%", loc="upper right"))
+            ),
+            "description": "It is clear that the data is zero-inflated, with zero claims submitted dominating the remaining claim counts."
         }
+        
     ]
 
     for info in plot_info:
@@ -135,10 +158,16 @@ def data_visualisation(data, map):
                 plt.yticks(color="black", fontsize=10)
             elif "Province" in info["title"]:
                 ax.axis("off")
+            elif "Distribution" in info["title"]:
+                ax.set_xlabel("Number of Claims", fontsize=12, color=base_color, fontweight="bold")
+                ax.set_ylabel("Frequency", fontsize=12, color=base_color, fontweight="bold")
+                plt.xticks(color="black", fontsize=10)
+                plt.yticks(color="black", fontsize=10)
             st.pyplot(fig)
             st.write("---")
         
         with col2:
+            st.write("---")
             col2.subheader(info["title"])
             st.write(info["description"])
             st.write("---")
@@ -184,7 +213,7 @@ def model_evaluation(data):
 
     X_infl = sm.add_constant(X)
 
-    col_zip, col_poi = st.columns(2)
+    col_zip, col_poi = st.columns(2, border=True)
 
     with col_zip:
         st.subheader("Zero-Inflated Poisson (ZIP)")
@@ -215,7 +244,7 @@ def model_evaluation(data):
 
             df_encoded["pred_zip"] = zip_model.predict(X, exog_infl=X_infl)
 
-            st.write("### ZIP Coefficients (no SE reported)")
+            st.write("### ZIP Coefficients")
             zip_params = pd.DataFrame({
                 "coef": zip_model.params,
             })
@@ -247,7 +276,7 @@ def model_evaluation(data):
         except Exception as e:
             st.error(f"Poisson failed: {e}")
 
-    st.subheader("Lift Chart (Model Comparison)")
+    st.subheader("Lift Chart")
 
     try:
         df_encoded["decile"] = pd.qcut(df_encoded["pred_zip"], 10, labels=False) + 1
