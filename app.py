@@ -74,8 +74,9 @@ def data_visualisation(data, map=None):
 
     plot_info = [
         {
-            #"title": "Number of Claims by Province",
-            "plot_func": lambda ax: st.image("data/map.png", use_column_width=True),
+            "title": "Number of Claims by Province",
+            "type": "image", 
+            "plot_func": lambda: st.image("data/map.png", use_column_width=True),
             "description": (
                 "It is clear from the chart that the Western Cape has the most claims, "
                 "followed by Gauteng. This makes sense because these two provinces are urban and therefore more active."
