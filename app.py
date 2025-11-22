@@ -74,7 +74,7 @@ def data_visualisation(data, map=None):
 
     plot_info = [
         {
-            "title": "Number of Claims by Province",
+            #"title": "Number of Claims by Province",
             "plot_func": lambda ax: st.image("data/map.png", use_column_width=True),
             "description": (
                 "It is clear from the chart that the Western Cape has the most claims, "
