@@ -13,14 +13,13 @@ import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from statsmodels.discrete.count_model import ZeroInflatedPoisson, ZeroInflatedNegativeBinomialP
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-import plotly.express as px
+#import geopandas as gp
 
 def load_data():
 
     df = pd.read_csv('data/historical_data.csv')
-    with open("data/za_provinces.geojson", "r") as f:
-        gdf = json.load(f)
-    return df, gdf
+    #gdf = gp.read_file('data\Province.shp')
+    return df#, gdf
 
 def data_visualisation(data, map):
 
@@ -30,7 +29,7 @@ def data_visualisation(data, map):
 
     # Importing the data
     df = data.copy()
-    gdf = map
+    #gdf = map
 
     # Total claims
     df["total_claims"] = df["pastclaims"] + df["claims"]
@@ -63,33 +62,20 @@ def data_visualisation(data, map):
 
     claims_per_province = df.groupby("province_full")["total_claims"].sum().reset_index()
 
+    #merged = gdf.merge(
+    #    claims_per_province,
+    #    left_on="PROVINCE",
+    #    right_on="province_full",
+    #    how="left"
+    #)
+
     cmap = mcolors.LinearSegmentedColormap.from_list("custom_blues", ["#ff7ea9", base_color])
     sns.set_style("whitegrid")
 
     plot_info = [
         {
             "title": "Number of Claims by Province",
-            "plot_func": lambda ax: st.plotly_chart(
-                px.choropleth(
-                    claims_per_province,
-                    geojson=gdf,
-                    locations="province_full",
-                    featureidkey="properties.PROVINCE",
-                    color="total_claims",
-                    color_continuous_scale=["#ff7ea9", "#df004c"],
-                    labels={"total_claims": "Number of Claims"}
-                ).update_geos(
-                    fitbounds="locations",  # zoom to South Africa provinces
-                    visible=False           # hide axes/gridlines
-                ).update_layout(
-                    margin={"r":0,"t":0,"l":0,"b":0},  # remove whitespace
-                    paper_bgcolor="white",             # white page background
-                    plot_bgcolor="white",              # white map background
-                    title_text="Number of Claims by Province",
-                    title_x=0.5                        # center the title
-                ),
-                use_container_width=True
-            ),
+            "plot_func": lambda ax: st.image("data/map.png", use_column_width=True),
             "description": (
                 "It is clear from the chart that the Western Cape has the most claims, "
                 "followed by Gauteng. This makes sense because these two provinces are urban and therefore more active."
