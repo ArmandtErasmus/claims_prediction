@@ -431,7 +431,7 @@ def main():
 
     mode = sidebar()
 
-    historical_data, za_map = load_data()
+    historical_data = load_data() #,za_map
 
     match mode:
             
