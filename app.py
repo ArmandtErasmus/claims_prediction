@@ -78,8 +78,17 @@ def data_visualisation(data, map):
                     color="total_claims",
                     color_continuous_scale=["#ff7ea9", "#df004c"],
                     labels={"total_claims": "Number of Claims"}
-                ).update_geos(fitbounds="locations", visible=False)
-                .update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+                ).update_geos(
+                    fitbounds="locations",  # zoom to South Africa provinces
+                    visible=False           # hide axes/gridlines
+                ).update_layout(
+                    margin={"r":0,"t":0,"l":0,"b":0},  # remove whitespace
+                    paper_bgcolor="white",             # white page background
+                    plot_bgcolor="white",              # white map background
+                    title_text="Number of Claims by Province",
+                    title_x=0.5                        # center the title
+                ),
+                use_container_width=True
             ),
             "description": (
                 "It is clear from the chart that the Western Cape has the most claims, "
