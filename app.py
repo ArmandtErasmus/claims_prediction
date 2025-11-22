@@ -13,6 +13,7 @@ import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from statsmodels.discrete.count_model import ZeroInflatedPoisson, ZeroInflatedNegativeBinomialP
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import plotly.express as px
 
 def load_data():
 
@@ -62,33 +63,28 @@ def data_visualisation(data, map):
 
     claims_per_province = df.groupby("province_full")["total_claims"].sum().reset_index()
 
-    merged = gdf.merge(
-        claims_per_province,
-        left_on="PROVINCE",
-        right_on="province_full",
-        how="left"
-    )
-
     cmap = mcolors.LinearSegmentedColormap.from_list("custom_blues", ["#ff7ea9", base_color])
     sns.set_style("whitegrid")
 
     plot_info = [
         {
             "title": "Number of Claims by Province",
-            "plot_func": lambda ax: merged.plot(
-                column="total_claims",
-                cmap=cmap,
-                linewidth=0.8,
-                edgecolor="black",
-                legend=True,
-                legend_kwds={"label": "Number of Claims",
-                            "orientation": "horizontal",
-                            "shrink": 0.6,
-                            "pad": 0.02},
-                ax=ax
+            "plot_func": lambda ax: st.plotly_chart(
+                px.choropleth(
+                    claims_per_province,
+                    geojson=gdf,
+                    locations="province_full",
+                    featureidkey="properties.PROVINCE",
+                    color="total_claims",
+                    color_continuous_scale=["#ff7ea9", "#df004c"],
+                    labels={"total_claims": "Number of Claims"}
+                ).update_geos(fitbounds="locations", visible=False)
+                .update_layout(margin={"r":0,"t":0,"l":0,"b":0})
             ),
-            "description": "It is clear from the chart that the Western Cape has the most claims, followed by Gauteng. "
-                        "This makes sense because these two provinces are urban and therefore more active."
+            "description": (
+                "It is clear from the chart that the Western Cape has the most claims, "
+                "followed by Gauteng. This makes sense because these two provinces are urban and therefore more active."
+            )
         },
         {
             "title": "Number of Claims by Gender",
