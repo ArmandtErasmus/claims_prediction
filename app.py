@@ -130,35 +130,42 @@ def data_visualisation(data, map=None):
         col1, col2 = st.columns(2, vertical_alignment="top")
         
         with col1:
-            fig, ax = plt.subplots(figsize=(7, 7))
-            info["plot_func"](ax)
-            ax.set_title(
-                info["title"],
-                fontsize=14,
-                color=base_color,
-                fontweight="bold",
-                loc="left",
-                pad=15
-            )
-            if "Gender" in info["title"]:
-                ax.set_xlabel("Gender", fontsize=12, color=base_color, fontweight="bold")
-                ax.set_ylabel("Total Claims", fontsize=12, color=base_color, fontweight="bold")
-                plt.xticks(color="black", fontsize=10)
-                plt.yticks(color="black", fontsize=10)
-            elif "Car Colour" in info["title"]:
-                ax.set_xlabel("Car Colour", fontsize=12, color=base_color, fontweight="bold")
-                ax.set_ylabel("Total Claims", fontsize=12, color=base_color, fontweight="bold")
-                plt.xticks(rotation=45, color="black", fontsize=10)
-                plt.yticks(color="black", fontsize=10)
-            elif "Province" in info["title"]:
-                ax.axis("off")
-            elif "Distribution" in info["title"]:
-                ax.set_xlabel("Number of Claims", fontsize=12, color=base_color, fontweight="bold")
-                ax.set_ylabel("Frequency", fontsize=12, color=base_color, fontweight="bold")
-                plt.xticks(color="black", fontsize=10)
-                plt.yticks(color="black", fontsize=10)
-            st.pyplot(fig)
-            st.write("---")
+             
+            if info.get("type") == "image":
+                st.image("data/map.png", use_column_width=True)
+            
+            
+            else:
+                fig, ax = plt.subplots(figsize=(7, 7))
+                info["plot_func"](ax)
+
+                ax.set_title(
+                    info["title"],
+                    fontsize=14,
+                    color=base_color,
+                    fontweight="bold",
+                    loc="left",
+                    pad=15
+                )
+                if "Gender" in info["title"]:
+                    ax.set_xlabel("Gender", fontsize=12, color=base_color, fontweight="bold")
+                    ax.set_ylabel("Total Claims", fontsize=12, color=base_color, fontweight="bold")
+                    plt.xticks(color="black", fontsize=10)
+                    plt.yticks(color="black", fontsize=10)
+                elif "Car Colour" in info["title"]:
+                    ax.set_xlabel("Car Colour", fontsize=12, color=base_color, fontweight="bold")
+                    ax.set_ylabel("Total Claims", fontsize=12, color=base_color, fontweight="bold")
+                    plt.xticks(rotation=45, color="black", fontsize=10)
+                    plt.yticks(color="black", fontsize=10)
+                elif "Province" in info["title"]:
+                    ax.axis("off")
+                elif "Distribution" in info["title"]:
+                    ax.set_xlabel("Number of Claims", fontsize=12, color=base_color, fontweight="bold")
+                    ax.set_ylabel("Frequency", fontsize=12, color=base_color, fontweight="bold")
+                    plt.xticks(color="black", fontsize=10)
+                    plt.yticks(color="black", fontsize=10)
+                st.pyplot(fig)
+                st.write("---")
         
         with col2:
             st.write("---")
