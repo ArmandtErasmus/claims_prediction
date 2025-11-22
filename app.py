@@ -8,7 +8,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
-import geopandas as gp
+import json
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from statsmodels.discrete.count_model import ZeroInflatedPoisson, ZeroInflatedNegativeBinomialP
@@ -17,7 +17,8 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 def load_data():
 
     df = pd.read_csv('data\historical_data.csv')
-    gdf = gp.read_file('data\Province.shp')
+    with open("data/za_provinces.geojson", "r") as f:
+        gdf = json.load(f)
     return df, gdf
 
 def data_visualisation(data, map):
