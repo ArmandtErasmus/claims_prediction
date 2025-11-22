@@ -250,6 +250,13 @@ def model_evaluation(data):
             })
             st.dataframe(zip_params)
 
+            st.session_state["zip_model"] = zip_model
+            st.session_state["model_features"] = model_features
+            st.session_state["selected_features"] = selected_features
+            st.session_state["ohe_columns"] = ohe_columns
+            st.session_state["cols_exog"] = X.columns.tolist()
+            st.session_state["cols_exog_infl"] = X_infl.columns.tolist()
+
         except Exception as e:
             st.error(f"ZIP failed: {e}")
 
@@ -272,6 +279,11 @@ def model_evaluation(data):
             st.markdown(glm_model.summary().as_html(), unsafe_allow_html=True)
 
             df_encoded["pred_poi"] = glm_model.predict(df_encoded)
+
+            st.session_state["poi_model"] = glm_model
+            st.session_state["model_features"] = model_features
+            st.session_state["selected_features"] = selected_features
+            st.session_state["ohe_columns"] = ohe_columns
 
         except Exception as e:
             st.error(f"Poisson failed: {e}")
@@ -303,8 +315,109 @@ def model_evaluation(data):
 
 def claims_frequency_prediction():
     
-    text = st.write("Claims Frequency Prediction")
-    return text
+    st.header("Claims Frequency Prediction")
+
+    if "zip_model" not in st.session_state or "poi_model" not in st.session_state:
+        st.warning("Please train a model first in 'Model Creation and Evaluation'.")
+        return
+
+    zip_model = st.session_state["zip_model"]
+    poi_model = st.session_state["poi_model"]
+    model_features = st.session_state["model_features"]
+    selected_features = st.session_state["selected_features"]
+    ohe_columns = st.session_state["ohe_columns"]
+
+    st.subheader("Enter feature values")
+
+    input_data = {}
+
+    for feat in selected_features:
+
+        if feat in ohe_columns:
+            
+            levels = sorted([c.split(f"{feat}_")[1] for c in model_features if c.startswith(feat + "_")])
+            choice = st.selectbox(f"{feat}", levels)
+            input_data[feat] = choice
+
+        else:
+            
+            val = st.number_input(f"{feat}", value=0.0)
+            input_data[feat] = val
+
+    row_exog = {}
+    row_infl = {}
+
+    for col in st.session_state["cols_exog"]:
+        if col == "const":
+            row_exog[col] = 1.0
+        elif "_" in col:  
+            base, level = col.split("_")
+            row_exog[col] = 1 if input_data.get(base) == level else 0
+        else:
+            row_exog[col] = input_data[col]
+
+    for col in st.session_state["cols_exog_infl"]:
+        if col == "const":
+            row_infl[col] = 1.0
+        elif "_" in col:
+            base, level = col.split("_")
+            row_infl[col] = 1 if input_data.get(base) == level else 0
+        else:
+            row_infl[col] = input_data[col]
+
+    X_new = pd.DataFrame([row_exog])
+    X_new_infl = pd.DataFrame([row_infl])
+
+    exp_years = st.number_input("Exposure (exp_years)", value=1.0, min_value=0.0001)
+    offset = np.log(exp_years)
+
+    if st.button("Predict"):
+
+        pred_zip = zip_model.predict(X_new, exog_infl=X_new_infl)
+        pred_poi = poi_model.predict(X_new, offset=offset)
+
+        st.write("---")
+
+        st.subheader("Interpretation")
+
+        def interpret_prediction(pred, model_name):
+            yearly = float(pred)
+            prob_zero = np.exp(-yearly)
+
+            st.write(f"### {model_name} Model")
+            st.write(f"- Expected number of claims **per year**: `{yearly:.4f}`")
+            st.write(f"- Chance of **at least one claim**: `{(1 - prob_zero)*100:.1f}%`")
+            st.write(f"- Chance of **zero claims**: `{prob_zero*100:.1f}%`")
+            #st.write("---")
+
+        col1, col2 = st.columns(2, border=True)
+
+        with col1:
+
+            interpret_prediction(pred_zip, "Zero-Inflated Poisson (ZIP)")
+
+        with col2:
+            interpret_prediction(pred_poi, "Standard Poisson")
+
+        st.write("---")
+
+        st.subheader("Risk Category")
+
+        def risk_category(lambda_pred):
+            if lambda_pred < 0.05:
+                return "Very Low Risk Client", "🟢"
+            elif lambda_pred < 0.10:
+                return "Low Risk Client", "🟡"
+            elif lambda_pred < 0.20:
+                return "Medium Risk Client", "🟠"
+            else:
+                return "High Risk Client", "🔴"
+
+        zip_cat, zip_icon = risk_category(float(pred_zip))
+        poi_cat, poi_icon = risk_category(float(pred_poi))
+
+        st.write(f"**ZIP Model:** {zip_icon} {zip_cat}")
+        st.write(f"**Poisson Model:** {poi_icon} {poi_cat}")
 
 def sidebar():
 
