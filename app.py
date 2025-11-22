@@ -21,7 +21,7 @@ def load_data():
     #gdf = gp.read_file('data\Province.shp')
     return df#, gdf
 
-def data_visualisation(data, map):
+def data_visualisation(data, map=None):
 
     #  colour :) and some page customisations
     base_color = "#df004c"
@@ -436,7 +436,7 @@ def main():
     match mode:
             
             case "Data Visualisation and Analysis":
-                data_visualisation(historical_data, za_map)
+                data_visualisation(historical_data)
 
             case "Model Creation and Evaluation":
                 model_evaluation(historical_data)
