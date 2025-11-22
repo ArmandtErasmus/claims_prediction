@@ -17,7 +17,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 def load_data():
 
     df = pd.read_csv('data\historical_data.csv')
-    with open("data/za_provinces.geojson", "r") as f:
+    with open("data\za_provinces.geojson", "r") as f:
         gdf = json.load(f)
     return df, gdf
 
