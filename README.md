@@ -19,10 +19,10 @@ This interactive dashboard provides insights into car insurance claims data and 
 3. **Risk Prediction**
    - After training, users can **make new predictions** using either model.
    - Each prediction is classified into a **risk category** according to predicted claim frequency:
-     🟢 **Very Low Risk Client** 
-     🟡 **Low Risk Client**
-     🟠 **Medium Risk Client**
-     🔴 **High Risk Client**
+     - 🟢 **Very Low Risk Client** 
+     - 🟡 **Low Risk Client**
+     - 🟠 **Medium Risk Client**
+     - 🔴 **High Risk Client**
 
 # ⭐ Support the Project
 If you find this dashboard useful, you can support the project by:
