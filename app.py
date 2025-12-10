@@ -32,22 +32,26 @@ def data_visualisation(data, map=None):
     df = data.copy()
     #gdf = map
 
-    # car colour specific data (messy for now)
-    total_white_cars = df[df["carcolour"] == "White"].shape[0]
-    total_blue_cars = df[df["carcolour"] == "Blue"].shape[0]
-    total_green_cars = df[df["carcolour"] == "Green"].shape[0]
-    total_black_cars = df[df["carcolour"] == "Black"].shape[0]
-    total_yellow_cars = df[df["carcolour"] == "Yellow"].shape[0]
-    total_red_cars = df[df["carcolour"] == "Red"].shape[0]
-    total_silver_cars = df[df["carcolour"] == "Silver"].shape[0]
+    df2 = df.copy()
+    df2["totalclaims"] = df2["pastclaims"] + df2["claims"]
+    df2 = df2[["carcolour", "totalclaims"]]
 
-    total_white_claims = df.loc[df["carcolour"] == "White", "totalclaims"].sum()
-    total_blue_claims = df.loc[df["carcolour"] == "Blue", "totalclaims"].sum()
-    total_green_claims = df.loc[df["carcolour"] == "Green", "totalclaims"].sum()
-    total_black_claims = df.loc[df["carcolour"] == "Black", "totalclaims"].sum()
-    total_yellow_claims = df.loc[df["carcolour"] == "Yellow", "totalclaims"].sum()
-    total_red_claims = df.loc[df["carcolour"] == "Red", "totalclaims"].sum()
-    total_silver_claims = df.loc[df["carcolour"] == "Silver", "totalclaims"].sum()
+    # car colour specific data (messy for now)
+    total_white_cars = df2[df2["carcolour"] == "White"].shape[0]
+    total_blue_cars = df2[df2["carcolour"] == "Blue"].shape[0]
+    total_green_cars = df2[df2["carcolour"] == "Green"].shape[0]
+    total_black_cars = df2[df2["carcolour"] == "Black"].shape[0]
+    total_yellow_cars = df2[df2["carcolour"] == "Yellow"].shape[0]
+    total_red_cars = df2[df2["carcolour"] == "Red"].shape[0]
+    total_silver_cars = df2[df2["carcolour"] == "Silver"].shape[0]
+
+    total_white_claims = df2.loc[df2["carcolour"] == "White", "totalclaims"].sum()
+    total_blue_claims = df2.loc[df2["carcolour"] == "Blue", "totalclaims"].sum()
+    total_green_claims = df2.loc[df2["carcolour"] == "Green", "totalclaims"].sum()
+    total_black_claims = df2.loc[df2["carcolour"] == "Black", "totalclaims"].sum()
+    total_yellow_claims = df2.loc[df2["carcolour"] == "Yellow", "totalclaims"].sum()
+    total_red_claims = df2.loc[df2["carcolour"] == "Red", "totalclaims"].sum()
+    total_silver_claims = df2.loc[df2["carcolour"] == "Silver", "totalclaims"].sum()
 
     white_rate = total_white_claims / total_white_cars
     blue_rate = total_blue_claims / total_blue_cars
