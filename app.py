@@ -291,20 +291,20 @@ def data_visualisation(data, map=None):
                     xaxis=dict(
                         title=dict(
                             text='Vehicle Colour', 
-                            font=dict(size=18)  
+                            font=dict(size=14)  
                         ),
                         tickfont=dict(size=14)
                     ),
                     yaxis=dict(
                         title=dict(
                             text='Amount of Vehicles and Observed Claims',
-                            font=dict(size=18) 
+                            font=dict(size=14) 
                         ),
                         tickfont=dict(size=14)
                     ),
                     template="plotly_white",
                     title_text='Total Amount of Claims in Relation to the Amount of Vehicles Across Vehicle Colours',
-                    title_font=dict(size=24),
+                    title_font=dict(size=16),
                     title_x=0.5,
                     title_xanchor='center',
                     height=600,
