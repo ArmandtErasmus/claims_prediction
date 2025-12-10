@@ -185,16 +185,15 @@ def data_visualisation(data, map=None):
                         "with females having submitted slightly more claims than males."
         },
         {
-            "title": "Number of Claims by Car Colour",
+            "title": "Number of Claims by Vehicle Colour",
             "plot_func": lambda ax: sns.barplot(
                 x=claims_by_car_colour.index,
                 y=claims_by_car_colour.values,
                 color=base_color,
                 ax=ax
             ),
-            "description": "It is clear that white cars have the most claims, followed by red cars, and then black cars, "
-                        "with yellow cars having the least. This does not necessarily imply higher risk for white cars; "
-                        "it is because white cars are more common."
+            "description": "It is clear that white Vehicle have the most claims, followed by red Vehicle, and then black Vehicle, "
+                        "with yellow Vehicle having the least amount of claims. This does not necessarily imply higher risk for white Vehicle. As can be seen below, claim amounts are proportionate to the amount of vehicles."
         },
         {
             "title": "Distribution of the Number of Claims",
@@ -233,7 +232,7 @@ def data_visualisation(data, map=None):
                 ax.set_title(
                     info["title"],
                     fontsize=14,
-                    color=base_color,
+                    color="#363636",
                     fontweight="bold",
                     loc="left",
                     pad=15
