@@ -26,9 +26,9 @@ def data_visualisation(data, map=None):
 
     #  colour :) and some page customisations
     base_color = "#df004c"
-    st.markdown("<h2 style='color: #df004c;'>Data Visualisation and Analysis</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #363636;'>Data Visualisation and Analysis</h2>", unsafe_allow_html=True)
 
-    # Importing the data
+    # Importing the data"#363636"
     df = data.copy()
     #gdf = map
 
