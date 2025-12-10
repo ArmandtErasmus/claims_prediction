@@ -14,6 +14,7 @@ import statsmodels.api as sm
 from statsmodels.discrete.count_model import ZeroInflatedPoisson, ZeroInflatedNegativeBinomialP
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 #import geopandas as gp
+import plotly.graph_objects as go
 
 def load_data():
 
@@ -31,6 +32,90 @@ def data_visualisation(data, map=None):
     df = data.copy()
     #gdf = map
 
+    # car colour specific data (messy for now)
+    total_white_cars = df[df["carcolour"] == "White"].shape[0]
+    total_blue_cars = df[df["carcolour"] == "Blue"].shape[0]
+    total_green_cars = df[df["carcolour"] == "Green"].shape[0]
+    total_black_cars = df[df["carcolour"] == "Black"].shape[0]
+    total_yellow_cars = df[df["carcolour"] == "Yellow"].shape[0]
+    total_red_cars = df[df["carcolour"] == "Red"].shape[0]
+    total_silver_cars = df[df["carcolour"] == "Silver"].shape[0]
+
+    total_white_claims = df.loc[df["carcolour"] == "White", "totalclaims"].sum()
+    total_blue_claims = df.loc[df["carcolour"] == "Blue", "totalclaims"].sum()
+    total_green_claims = df.loc[df["carcolour"] == "Green", "totalclaims"].sum()
+    total_black_claims = df.loc[df["carcolour"] == "Black", "totalclaims"].sum()
+    total_yellow_claims = df.loc[df["carcolour"] == "Yellow", "totalclaims"].sum()
+    total_red_claims = df.loc[df["carcolour"] == "Red", "totalclaims"].sum()
+    total_silver_claims = df.loc[df["carcolour"] == "Silver", "totalclaims"].sum()
+
+    white_rate = total_white_claims / total_white_cars
+    blue_rate = total_blue_claims / total_blue_cars
+    green_rate = total_green_claims / total_green_cars
+    black_rate = total_black_claims / total_black_cars
+    yellow_rate = total_yellow_claims / total_yellow_cars
+    red_rate = total_red_claims / total_red_cars
+    silver_rate = total_silver_claims / total_silver_cars
+
+    car_counts = {
+        "White": total_white_cars,
+        "Blue": total_blue_cars,
+        "Green": total_green_cars,
+        "Black": total_black_cars,
+        "Yellow": total_yellow_cars,
+        "Red": total_red_cars,
+        "Silver": total_silver_cars
+    }
+
+    claims = {
+        "White": total_white_claims,
+        "Blue": total_blue_claims,
+        "Green": total_green_claims,
+        "Black": total_black_claims,
+        "Yellow": total_yellow_claims,
+        "Red": total_red_claims,
+        "Silver": total_silver_claims
+    }
+
+    # claims by car colour
+    df_claims = pd.DataFrame({
+        "carcolour" : list(claims.keys()),
+        "claims" : list(claims.values()),
+        "num_cars": list(car_counts.values())
+    })
+
+    # rates by car colour
+    rates = {
+        "White": white_rate,
+        "Blue": blue_rate,
+        "Green": green_rate,
+        "Black": black_rate,
+        "Yellow": yellow_rate,
+        "Red": red_rate,
+        "Silver": silver_rate
+    }
+
+    df_rates = pd.DataFrame({
+        "carcolour": list(rates.keys()),
+        "claim_rate": list(rates.values())
+    })
+
+    # overlay total cars by car colour and total claims by car colour
+    df_overlay = pd.DataFrame({
+        "carcolour": ["White", "Blue", "Green", "Black", "Yellow", "Red", "Silver"],
+        "total_cars": [
+            total_white_cars, total_blue_cars, total_green_cars, total_black_cars,
+            total_yellow_cars, total_red_cars, total_silver_cars
+        ],
+        "total_claims": [
+            total_white_claims, total_blue_claims, total_green_claims, total_black_claims,
+            total_yellow_claims, total_red_claims, total_silver_claims
+        ]
+    })
+
+
+    df_rates["claim_rate"] = df_rates["claim_rate"] * 1000 # per 1000 cars :D
+
     # Total claims
     df["total_claims"] = df["pastclaims"] + df["claims"]
 
@@ -42,6 +127,8 @@ def data_visualisation(data, map=None):
 
     # Aggregate by car colour
     claims_by_car_colour = df.groupby("carcolour")["total_claims"].sum()
+
+
 
     # get claims counts data :)
     counts = df['claims'].value_counts().sort_index()
@@ -171,6 +258,56 @@ def data_visualisation(data, map=None):
             st.write("---")
             col2.subheader(info["title"])
             st.write(info["description"])
+            if info["title"] == "Number of Claims by Car Colour":
+                fig = go.Figure()
+
+                fig.add_trace(go.Bar(
+                    x=df_overlay["carcolour"],
+                    y=df_overlay["total_claims"],
+                    name="Amount of Claims",
+                    marker_color="#801a3c",
+                    text=df_overlay["total_claims"],
+                    textposition="outside"  
+                ))
+
+                fig.add_trace(go.Bar(
+                    x=df_overlay["carcolour"],
+                    y=df_overlay["total_cars"],
+                    name="Amount of Vehicles",
+                    marker_color="#df004c",
+                    text=df_overlay["total_cars"],
+                    textposition="inside"
+                ))
+
+                fig.update_traces(texttemplate='%{text:.0f}')
+
+                fig.update_layout(
+                    barmode="overlay",       
+                    xaxis_tickangle=0,
+                    xaxis=dict(
+                        title=dict(
+                            text='Vehicle Colour', 
+                            font=dict(size=18)  
+                        ),
+                        tickfont=dict(size=14)
+                    ),
+                    yaxis=dict(
+                        title=dict(
+                            text='Amount of Vehicles and Observed Claims',
+                            font=dict(size=18) 
+                        ),
+                        tickfont=dict(size=14)
+                    ),
+                    template="plotly_white",
+                    title_text='Total Amount of Claims in Relation to the Amount of Vehicles Across Vehicle Colours',
+                    title_font=dict(size=24),
+                    title_x=0.5,
+                    title_xanchor='center',
+                    height=600,
+                    margin=dict(t=50)
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
             st.write("---")
 
 def model_evaluation(data):
