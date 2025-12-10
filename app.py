@@ -532,7 +532,7 @@ def claims_frequency_prediction():
             st.write(f"- Chance of **zero claims**: `{prob_zero*100:.1f}%`")
             #st.write("---")
 
-        col1, col2 = st.columns(2, border=True)
+        col1, col2, col3= st.columns(3, border=True)
 
         with col1:
 
@@ -541,25 +541,25 @@ def claims_frequency_prediction():
         with col2:
             interpret_prediction(pred_poi, "Standard Poisson")
 
-        st.write("---")
+        #st.write("---")
+        with col3:
+            st.subheader("Risk Category")
 
-        st.subheader("Risk Category")
+            def risk_category(lambda_pred):
+                if lambda_pred < 0.05:
+                    return "Very Low Risk Client", "🟢"
+                elif lambda_pred < 0.10:
+                    return "Low Risk Client", "🟡"
+                elif lambda_pred < 0.20:
+                    return "Medium Risk Client", "🟠"
+                else:
+                    return "High Risk Client", "🔴"
 
-        def risk_category(lambda_pred):
-            if lambda_pred < 0.05:
-                return "Very Low Risk Client", "🟢"
-            elif lambda_pred < 0.10:
-                return "Low Risk Client", "🟡"
-            elif lambda_pred < 0.20:
-                return "Medium Risk Client", "🟠"
-            else:
-                return "High Risk Client", "🔴"
+            zip_cat, zip_icon = risk_category(float(pred_zip))
+            poi_cat, poi_icon = risk_category(float(pred_poi))
 
-        zip_cat, zip_icon = risk_category(float(pred_zip))
-        poi_cat, poi_icon = risk_category(float(pred_poi))
-
-        st.write(f"**ZIP Model:** {zip_icon} {zip_cat}")
-        st.write(f"**Poisson Model:** {poi_icon} {poi_cat}")
+            st.write(f"**ZIP Model:** {zip_icon} {zip_cat}")
+            st.write(f"**Poisson Model:** {poi_icon} {poi_cat}")
 
 def sidebar():
 
