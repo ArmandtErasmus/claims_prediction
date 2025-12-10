@@ -310,7 +310,8 @@ def data_visualisation(data, map=None):
                     margin=dict(t=50)
                 )
 
-                st.plotly_chart(fig, use_container_width=True)
+                with st.container():
+                    st.plotly_chart(fig, use_container_width=True)
             st.write("---")
 
 def model_evaluation(data):
