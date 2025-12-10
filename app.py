@@ -261,7 +261,7 @@ def data_visualisation(data, map=None):
             st.write("---")
             col2.subheader(info["title"])
             st.write(info["description"])
-            if info["title"] == "Number of Claims by Car Colour":
+            if info["title"] == "Number of Claims by Vehicle Colour":
                 fig = go.Figure()
 
                 fig.add_trace(go.Bar(
