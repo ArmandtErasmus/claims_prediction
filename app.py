@@ -239,20 +239,20 @@ def data_visualisation(data, map=None):
                     pad=15
                 )
                 if "Gender" in info["title"]:
-                    ax.set_xlabel("Gender", fontsize=12, color=base_color, fontweight="bold")
-                    ax.set_ylabel("Total Claims", fontsize=12, color=base_color, fontweight="bold")
+                    ax.set_xlabel("Gender", fontsize=12, color="#363636", fontweight="bold")
+                    ax.set_ylabel("Total Amount of Claims", fontsize=12, color="#363636", fontweight="bold")
                     plt.xticks(color="black", fontsize=10)
                     plt.yticks(color="black", fontsize=10)
                 elif "Car Colour" in info["title"]:
-                    ax.set_xlabel("Car Colour", fontsize=12, color=base_color, fontweight="bold")
-                    ax.set_ylabel("Total Claims", fontsize=12, color=base_color, fontweight="bold")
+                    ax.set_xlabel("Vehicle Colour", fontsize=12, color="#363636", fontweight="bold")
+                    ax.set_ylabel("Total Amount of Claims", fontsize=12, color="#363636", fontweight="bold")
                     plt.xticks(rotation=45, color="black", fontsize=10)
                     plt.yticks(color="black", fontsize=10)
                 elif "Province" in info["title"]:
                     ax.axis("off")
                 elif "Distribution" in info["title"]:
-                    ax.set_xlabel("Number of Claims", fontsize=12, color=base_color, fontweight="bold")
-                    ax.set_ylabel("Frequency", fontsize=12, color=base_color, fontweight="bold")
+                    ax.set_xlabel("Number of Claims", fontsize=12, color="#363636", fontweight="bold")
+                    ax.set_ylabel("Frequency", fontsize=12, color="#363636", fontweight="bold")
                     plt.xticks(color="black", fontsize=10)
                     plt.yticks(color="black", fontsize=10)
                 st.pyplot(fig)
